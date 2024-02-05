@@ -1,34 +1,64 @@
 const fs = require('fs');
 const express = require('express');
-const path = require('path');
-const bodyParser = require("body-parser");
+const { Console } = require('console');
+const morgan = require('morgan');
+const compression = require('compression');
+const helmet = require('helmet');
+// const path = require('path');
+// const bodyParser = require("body-parser"); merged into express
 
 let app = express();
+app.use(morgan('tiny'));
+app.use(helmet());
+app.use(compression());
 
-// Tester to insure its working
-// app.get('/', (req, res) => {
-//     res.send('welcome to serverAgain.js');
-//     });
-    
-// auto gathers the css,js, and html
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.urlencoded({ extended: false }));
 
-app.use((req,res, next) => {
-    console.log(req.originalUrl);
-    fs.appendFileSync('log.txt', `${req.url}\n`);
-    next();
-});
-
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(express.static('public'));
 
 app.use((req, res, next) => {
-    fs.appendFileSync('log.txt', `${req.url,req.body.username}\n`);
+    fs.appendFileSync('log.text',
+        `{
+        "url":${req.url},
+        "method" ${req.method},
+        "timestamp": ${new Date().toLocaleString()},
+        "ip-address":${req.ip},
+        "userName": ${req.body.username}
+        } \n`);
     next();
 });
 
-app.post(`/submit-form`, (req,res)=>{
-    console.log(req.body.username + '|' + req.body.email+'|'+req.originalUrl);
-res.send('Thanks for submitting |'+req.body.username + '|' + req.body.email+'|'+req.originalUrl);
-})
+app.post(`/submit-form`, (req, res) => {
+    const newData = {
+        url: `${req.url}`,
+        method: ` ${req.method}`,
+        timestamp: new Date().toLocaleString(),
+        ipAddress: `${req.ip}`,
+        userName: `${req.body.username}`,
+        email: `${req.body.email}`
+    };
 
-app.listen(3000);
+    fs.writeFile('last-submission.json', JSON.stringify(newData), (err) => {
+        if (err) {
+            console.log(err)
+            res.send('Whoops there is a problem')
+        } else {
+            console.log('success')
+            res.send(newData)
+        }
+    })
+});
+
+app.get('/submissions', (req, res) => {
+    fs.readFile('last-submission.json', { encoding: "utf8" }, (err, data) => {
+        if (err) {
+            console.log(err);
+            res.send('Whoops there is a problem on the link');
+        } else {
+            const parsed = JSON.parse(data);
+            res.send(parsed);
+        }
+    })
+});
+
+app.listen(3000, () => { console.log(`successful connection on port 3000 (launched at ${new Date().toLocaleString()})`) });

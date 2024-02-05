@@ -14,14 +14,15 @@
 
 <body>
     <header class="row red-text  justify-content-center">
-        <h1 class="col-6">Express header</h1> 
+        <h1 class="col-6">Express header</h1>
         <!-- place navbar here -->
     </header>
     <main class="row justify-content-center">
         <form class="col-6 mb-3" action="/submit-form" method="POST">
             <div>
                 <label for="" class="form-label">Username:</label>
-                <input type="username" class="form-control" name="username" id="" aria-describedby="helpId" placeholder="" />
+                <input type="username" class="form-control" name="username" id="" aria-describedby="helpId"
+                    placeholder="" />
                 <small id="helpId" class="form-text text-muted">Help text</small>
             </div>
             <div>
@@ -29,8 +30,9 @@
                 <input type="email" class="form-control" name="email" id="" aria-describedby="helpId" placeholder="" />
                 <small id="helpId" class="form-text text-muted">Help text</small>
             </div>
-            <button id="emailHelpId" class="form-text text-muted btn btn-primary" value="Make Contact" type="submit"
-            >Submit and move to /submit-form</button
+            <button id="emailHelpId" class="form-text text-muted btn btn-primary" value="Make Contact"
+                type="submit">Submit and move to /submit-form</button>
+            <a href="/submissions">Get all submissions</a>
         </form>
 
     </main>
